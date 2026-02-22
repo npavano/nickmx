@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nick's Mixes</title>
+  <meta name="description" content="A 90s file sharing inspired mixtape playlist library." />
+
+  <style>
+    :root{
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    :root[data-theme="dark"]{
+      --bg0:#05050c;
+      --bg1:#0b1030;
+      --edge:rgba(255,255,255,0.16);
+      --txt:#e9ecff;
+      --mut:#b9c0ff;
+      --hot:#ff4fd8;
+      --cyan:#53e7ff;
+      --lime:#39ff14;
+      --gold:#ffe36e;
+      --shadow:rgba(0,0,0,0.55);
+
+      --winA: rgba(17,22,58,0.92);
+      --winB: rgba(14,19,51,0.86);
+      --sbA: rgba(14,19,51,0.92);
+      --sbB: rgba(10,13,36,0.92);
+      --barA: rgba(26,34,87,0.95);
+      --barB: rgba(18,24,58,0.85);
+
+      --panelBg: rgba(0,0,0,0.18);
+      --inputBg: rgba(0,0,0,0.22);
+
+      --scanOpacity: 0.12;
+      --scanLine: rgba(255,255,255,0.10);
+
+      --good: var(--lime);
+      --teal: var(--cyan);
+
+      --spotify:#1DB954;
+      --coral:#ff7f6e;
+
+      --appleHover:#FA3464;
+      --youtubeHover:#A80303;
+    }
+
+    :root[data-theme="light"]{
+      --bg0:#f7f6ff;
+      --bg1:#e7ecff;
+      --edge:rgba(0,0,0,0.14);
+      --txt:#0e1230;
+      --mut:#2b3470;
+      --hot:#c7008a;
+      --cyan:#007aa3;
+      --lime:#0a8f2e;
+      --gold:#b07a00;
+      --shadow:rgba(0,0,0,0.20);
+
+      --winA: rgba(255,255,255,0.86);
+      --winB: rgba(248,250,255,0.84);
+      --sbA: rgba(255,255,255,0.82);
+      --sbB: rgba(245,248,255,0.86);
+      --barA: rgba(227,235,255,0.92);
+      --barB: rgba(214,225,255,0.88);
+
+      --panelBg: rgba(255,255,255,0.72);
+      --inputBg: rgba(255,255,255,0.80);
+
+      --scanOpacity: 0.06;
+      --scanLine: rgba(0,0,0,0.08);
+
+      --good: var(--lime);
+      --teal: var(--cyan);
+
+      --spotify:#1DB954;
+      --coral:#ff6f61;
+
+      --appleHover:#FA3464;
+      --youtubeHover:#A80303;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+
+    body{
+      margin:0;
+      color:var(--txt);
+      font-family:var(--sans);
+      background-color: var(--bg1);
+      background-image:
+        radial-gradient(900px 600px at 20% 0%, color-mix(in srgb, var(--hot) 18%, transparent), transparent 55%),
+        radial-gradient(900px 600px at 80% 10%, color-mix(in srgb, var(--cyan) 18%, transparent), transparent 55%),
+        radial-gradient(900px 600px at 50% 100%, color-mix(in srgb, var(--lime) 14%, transparent), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      background-repeat:no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity: var(--scanOpacity);
+      background: repeating-linear-gradient(
+        180deg,
+        var(--scanLine) 0px,
+        var(--scanLine) 1px,
+        transparent 2px,
+        transparent 4px
+      );
+      mix-blend-mode: overlay;
+    }
+
+    .wrap{
+      width:min(1160px, 92vw);
+      margin:0 auto;
+      padding:18px 0 78px;
+    }
+
+    .window{
+      border:1px solid var(--edge);
+      border-radius:14px;
+      background: linear-gradient(180deg, var(--winA), var(--winB));
+      box-shadow: 0 18px 60px var(--shadow);
+      overflow:hidden;
+    }
+
+    .titlebar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      background: linear-gradient(180deg, var(--barA), var(--barB));
+      border-bottom:1px solid color-mix(in srgb, var(--edge) 70%, transparent);
+    }
+
+    .titleLeft{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .appIcon{
+      width:28px;
+      height:28px;
+      border-radius:8px;
+      border:1px solid color-mix(in srgb, var(--cyan) 45%, transparent);
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--cyan) 95%, white), color-mix(in srgb, var(--hot) 85%, white)),
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.18) 0 6px, rgba(255,255,255,0.22) 6px 12px);
+      box-shadow: 0 10px 25px color-mix(in srgb, var(--shadow) 70%, transparent);
+      flex:0 0 auto;
+    }
+
+    .appTitle{
+      display:grid;
+      gap:2px;
+      min-width:0;
+    }
+    .appTitle h1{
+      margin:0;
+      font-size:14px;
+      font-family:var(--mono);
+      letter-spacing:0.4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .appTitle p{
+      margin:0;
+      color: color-mix(in srgb, var(--txt) 70%, transparent);
+      font-size:12px;
+      font-family:var(--mono);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .titleRight{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
+    }
+
+    .winBtns{ display:flex; gap:8px; flex:0 0 auto; }
+    .dot{
+      width:12px; height:12px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,0.22);
+      box-shadow: 0 3px 10px color-mix(in srgb, var(--shadow) 80%, transparent);
+    }
+    .dot.red{ background: #ff6b6b; }
+    .dot.yellow{ background: color-mix(in srgb, var(--gold) 70%, #ffe36e); }
+    .dot.green{ background: color-mix(in srgb, var(--lime) 70%, #39ff14); }
+
+    .btn{
+      border:1px solid color-mix(in srgb, var(--edge) 80%, transparent);
+      background: color-mix(in srgb, var(--panelBg) 50%, transparent);
+      color:var(--txt);
+      padding:10px 12px;
+      border-radius:12px;
+      font-family:var(--mono);
+      font-size:12px;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{
+      border-color: color-mix(in srgb, var(--hot) 55%, transparent);
+      text-decoration:none;
+    }
+    .btn.small{ padding:8px 10px; border-radius:12px; font-size:12px; }
+
+    .btn.goodOutline{
+      border-color: color-mix(in srgb, var(--lime) 70%, transparent);
+      background: color-mix(in srgb, var(--panelBg) 50%, transparent);
+      box-shadow:none;
+    }
+    .btn.goodOutline:hover{ border-color: color-mix(in srgb, var(--lime) 90%, transparent); }
+
+    .btn.purpleOutline{
+      border-color: color-mix(in srgb, var(--hot) 70%, transparent);
+      background: color-mix(in srgb, var(--panelBg) 50%, transparent);
+      box-shadow:none;
+    }
+    .btn.purpleOutline:hover{ border-color: color-mix(in srgb, var(--hot) 90%, transparent); }
+
+    .btn.tealOutline{ border-color: color-mix(in srgb, var(--teal) 70%, transparent); }
+    .btn.tealOutline:hover{ border-color: color-mix(in srgb, var(--teal) 90%, transparent); }
+
+    .content{
+      display:grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 72vh;
+    }
+    @media (max-width: 980px){ .content{ grid-template-columns: 1fr; } }
+
+    .sidebar{
+      border-right:1px solid color-mix(in srgb, var(--edge) 70%, transparent);
+      background: linear-gradient(180deg, var(--sbA), var(--sbB));
+      padding:12px;
+      display:grid;
+      gap:12px;
+      align-content:start;
+    }
+
+    .panel{
+      border:1px solid color-mix(in srgb, var(--edge) 85%, transparent);
+      border-radius:10px;
+      background: var(--panelBg);
+      box-shadow: 0 10px 28px color-mix(in srgb, var(--shadow) 65%, transparent);
+      overflow:hidden;
+    }
+    .panelHd{
+      padding:10px 10px;
+      border-bottom:1px solid color-mix(in srgb, var(--edge) 70%, transparent);
+      background:
+        repeating-linear-gradient(90deg,
+          color-mix(in srgb, var(--hot) 18%, transparent) 0 14px,
+          color-mix(in srgb, var(--cyan) 16%, transparent) 14px 28px,
+          color-mix(in srgb, var(--lime) 14%, transparent) 28px 42px
+        );
+      font-family:var(--mono);
+      font-size:12px;
+      letter-spacing:0.5px;
+      text-transform:uppercase;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+    .panelBd{ padding:10px; display:grid; gap:10px; }
+
+    .chip{
+      font-family:var(--mono);
+      font-size:11px;
+      color: color-mix(in srgb, var(--txt) 92%, transparent);
+      border-radius:999px;
+      padding:6px 10px;
+      border:1px solid color-mix(in srgb, var(--edge) 75%, transparent);
+      background: color-mix(in srgb, var(--gold) 22%, transparent);
+      white-space:nowrap;
+    }
+    .chip.green{ background: color-mix(in srgb, var(--lime) 22%, transparent); }
+    .chip.cyan{ background: color-mix(in srgb, var(--cyan) 22%, transparent); }
+
+    .field{ display:grid; gap:6px; }
+    label{
+      font-size:12px;
+      font-family:var(--mono);
+      color: color-mix(in srgb, var(--txt) 85%, transparent);
+    }
+    input, select{
+      width:100%;
+      padding:10px 10px;
+      border-radius:10px;
+      border:1px solid color-mix(in srgb, var(--edge) 85%, transparent);
+      background: var(--inputBg);
+      color:var(--txt);
+      outline:none;
+      font-family:var(--sans);
+    }
+    input::placeholder{ color: color-mix(in srgb, var(--txt) 45%, transparent); }
+
+    .hint{
+      font-size:12px;
+      color: color-mix(in srgb, var(--txt) 70%, transparent);
+      line-height:1.4;
+      margin:0;
+    }
+
+    .kbd{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:3px 8px;
+      border:1px solid color-mix(in srgb, var(--edge) 75%, transparent);
+      border-radius:8px;
+      background: color-mix(in srgb, var(--panelBg) 55%, transparent);
+      color: color-mix(in srgb, var(--txt) 90%, transparent);
+      white-space:nowrap;
+    }
+
+    .main{ padding:12px; display:grid; gap:12px; align-content:start; }
+    .sections{ display:grid; gap:12px; }
+
+    .section{
+      border:1px solid color-mix(in srgb, var(--edge) 85%, transparent);
+      border-radius:10px;
+      background: var(--panelBg);
+      box-shadow: 0 10px 28px color-mix(in srgb, var(--shadow) 55%, transparent);
+      overflow:hidden;
+    }
+
+    .sectionHd{
+      padding:10px 10px;
+      border-bottom:1px solid color-mix(in srgb, var(--edge) 70%, transparent);
+      background: linear-gradient(180deg,
+        color-mix(in srgb, var(--panelBg) 85%, transparent),
+        color-mix(in srgb, var(--panelBg) 55%, transparent)
+      );
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .sectionHd h2{
+      margin:0;
+      font-family:var(--mono);
+      letter-spacing:0.4px;
+      font-size:13px;
+      text-transform:uppercase;
+    }
+
+    .cards{ padding:10px; display:grid; grid-template-columns: 1fr; gap:10px; }
+
+    .latestWrap{
+      border:2px solid color-mix(in srgb, var(--lime) 55%, transparent);
+      border-radius:10px;
+      background: var(--panelBg);
+      box-shadow: 0 12px 34px color-mix(in srgb, var(--shadow) 60%, transparent);
+      overflow:hidden;
+    }
+    .latestHd{
+      padding:10px 10px;
+      border-bottom:1px solid color-mix(in srgb, var(--edge) 70%, transparent);
+      background: linear-gradient(180deg,
+        color-mix(in srgb, var(--lime) 20%, transparent),
+        color-mix(in srgb, var(--lime) 6%, transparent)
+      );
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      font-family:var(--mono);
+      text-transform:uppercase;
+      letter-spacing:0.4px;
+      font-size:12px;
+    }
+
+    .featureRow{
+      padding:10px;
+      display:grid;
+      gap:10px;
+      grid-template-columns: 180px 1fr;
+      align-items:start;
+      border-radius:14px;
+    }
+    @media (max-width: 780px){ .featureRow{ grid-template-columns: 1fr; } }
+
+    .featureRow.found{
+      outline: 2px solid color-mix(in srgb, var(--hot) 55%, transparent);
+      box-shadow:
+        0 18px 70px color-mix(in srgb, var(--hot) 22%, transparent),
+        0 18px 70px color-mix(in srgb, var(--cyan) 18%, transparent);
+      animation: foundPulse 0.925s ease-in-out 0s 2;
+    }
+    @keyframes foundPulse{
+      0%{ transform: translateY(0) scale(1); }
+      25%{ transform: translateY(-6px) scale(1.012); }
+      50%{ transform: translateY(0) scale(1); }
+      75%{ transform: translateY(-3px) scale(1.006); }
+      100%{ transform: translateY(0) scale(1); }
+    }
+
+    .featureArt{
+      width:180px;
+      height:180px;
+      border-radius: 14px;
+      border:1px solid color-mix(in srgb, var(--edge) 85%, transparent);
+      background: color-mix(in srgb, var(--panelBg) 65%, transparent);
+      overflow:hidden;
+      position:relative;
+      box-shadow: 0 18px 44px color-mix(in srgb, var(--shadow) 60%, transparent);
+      display:grid;
+      place-items:center;
+    }
+    @media (max-width: 780px){
+      .featureArt{ width:100%; height:auto; aspect-ratio: 1 / 1; }
+    }
+    .featureArt img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      background: color-mix(in srgb, var(--panelBg) 65%, transparent);
+      filter: contrast(1.06) saturate(1.10);
+    }
+
+    .featureBody{
+      border-radius:14px;
+      border:1px solid color-mix(in srgb, var(--edge) 85%, transparent);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.16), rgba(0,0,0,0.22)),
+        radial-gradient(520px 220px at 25% 0%, color-mix(in srgb, var(--cyan) 14%, transparent), transparent 55%),
+        radial-gradient(520px 220px at 90% 25%, color-mix(in srgb, var(--hot) 12%, transparent), transparent 55%);
+      padding:12px;
+      box-shadow: 0 14px 34px color-mix(in srgb, var(--shadow) 55%, transparent);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      position:relative;
+      overflow:hidden;
+      min-width:0;
+    }
+
+    .mixTitle{
+      position:relative;
+      margin:0;
+      font-size:20px;
+      letter-spacing:0.2px;
+      line-height:1.15;
+      word-break: break-word;
+    }
+
+    .mixBadges{
+      position:relative;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .pill{
+      font-family:var(--mono);
+      font-size:12px;
+      color: color-mix(in srgb, var(--txt) 92%, transparent);
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid color-mix(in srgb, var(--edge) 75%, transparent);
+      white-space:nowrap;
+      background: color-mix(in srgb, var(--panelBg) 65%, transparent);
+    }
+    .pill.season{ background: color-mix(in srgb, var(--gold) 22%, transparent); }
+    .pill.year{ background: color-mix(in srgb, var(--cyan) 22%, transparent); }
+
+    .links{
+      position:relative;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:auto;
+    }
+
+    .iconLink{
+      height:39px;
+      padding:0 12px;
+      border-radius:12px;
+      border:1px solid color-mix(in srgb, var(--edge) 85%, transparent);
+      background: color-mix(in srgb, var(--panelBg) 55%, transparent);
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      text-decoration:none;
+      color: var(--txt);
+      flex:0 0 auto;
+      font-family: var(--mono);
+      font-size:12px;
+      line-height:1;
+    }
+    .iconLink:hover{ text-decoration:none; }
+    .iconLink.spotify:hover{ border-color: color-mix(in srgb, var(--spotify) 75%, transparent); }
+    .iconLink.apple:hover{ border-color: color-mix(in srgb, var(--appleHover) 80%, transparent); }
+    .iconLink.youtube:hover{ border-color: color-mix(in srgb, var(--youtubeHover) 95%, transparent); }
+
+    .iconLink.disabled{ opacity:0.45; cursor:default; pointer-events:none; }
+
+    .beetBtn{
+      width:auto;
+      height:auto;
+      padding:10px 12px;
+      border-radius:12px;
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      font-family:var(--mono);
+      font-size:12px;
+      border:1px solid color-mix(in srgb, var(--edge) 85%, transparent);
+      background: color-mix(in srgb, var(--panelBg) 55%, transparent);
+      color: var(--txt);
+      text-decoration:none;
+    }
+    .beetBtn:hover{ text-decoration:none; border-color: color-mix(in srgb, var(--spotify) 75%, transparent); }
+    #beetSaladBtn, #beetSaladBtn:hover, #beetSaladBtn:focus, #beetSaladBtn:active{ text-decoration:none !important; }
+
+    .liner{
+      position:relative;
+      border:1px dashed color-mix(in srgb, var(--edge) 85%, transparent);
+      border-radius:12px;
+      background: color-mix(in srgb, var(--panelBg) 65%, transparent);
+      overflow:hidden;
+      padding:10px;
+      display:grid;
+      gap:10px;
+      min-width:0;
+    }
+    .linerTitle{
+      font-family:var(--mono);
+      font-size:12px;
+      letter-spacing:0.3px;
+      text-transform:uppercase;
+      color: color-mix(in srgb, var(--txt) 78%, transparent);
+      margin:0;
+    }
+    .linerGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 780px){ .linerGrid{ grid-template-columns: 1fr; } }
+    .jbox{
+      border:1px solid color-mix(in srgb, var(--edge) 80%, transparent);
+      border-radius:12px;
+      background: color-mix(in srgb, var(--panelBg) 55%, transparent);
+      padding:10px;
+      min-width:0;
+    }
+    .jbox h4{
+      margin:0 0 6px;
+      font-family:var(--mono);
+      font-size:12px;
+      letter-spacing:0.3px;
+      text-transform:uppercase;
+      color: color-mix(in srgb, var(--txt) 82%, transparent);
+    }
+    .jbox p{
+      margin:0;
+      line-height:1.45;
+      font-family:var(--mono);
+      font-size:12px;
+      color: color-mix(in srgb, var(--txt) 62%, transparent);
+      word-break: break-word;
+    }
+
+    #creditsText{ white-space: pre-line; }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background: color-mix(in srgb, var(--txt) 12%, transparent);
+      border:1px solid color-mix(in srgb, var(--edge) 85%, transparent);
+      color: var(--txt);
+      padding:10px 12px;
+      border-radius:12px;
+      box-shadow: 0 16px 40px color-mix(in srgb, var(--shadow) 70%, transparent);
+      font-family:var(--mono);
+      font-size:12px;
+      display:none;
+      z-index:200;
+      max-width:min(92vw, 720px);
+      backdrop-filter: blur(6px);
+    }
+
+    .toTop{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      z-index:250;
+      opacity:0;
+      pointer-events:none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .toTop.show{
+      opacity:1;
+      pointer-events:auto;
+      transform: translateY(0);
+    }
+
+    .srOnly{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip: rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="window">
+      <div class="titlebar">
+        <div class="titleLeft">
+          <div class="appIcon" aria-hidden="true"></div>
+          <div class="appTitle">
+            <h1>Nick's Mixes</h1>
+            <p>May your first listen be a good listen.</p>
+          </div>
+        </div>
+
+        <div class="titleRight">
+          <button class="btn small" id="themeToggle" type="button" aria-label="Toggle light or dark mode">🌙 Dark</button>
+
+          <div class="winBtns" aria-hidden="true">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <aside class="sidebar">
+          <div class="panel">
+            <div class="panelHd">
+              <span>Search and Filter</span>
+              <span id="countChip" class="chip green">0</span>
+            </div>
+            <div class="panelBd">
+              <div class="field">
+                <label for="q">Search</label>
+                <input id="q" type="text" placeholder="mix name..." autocomplete="off" />
+              </div>
+
+              <div class="field">
+                <label for="seasonFilter">Season</label>
+                <select id="seasonFilter">
+                  <option value="">All seasons</option>
+                  <option>Winter</option>
+                  <option>Spring</option>
+                  <option>Summer</option>
+                  <option>Fall</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="yearFilter">Year</label>
+                <select id="yearFilter">
+                  <option value="">All years</option>
+                </select>
+              </div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap">
+                <button class="btn purpleOutline" id="surpriseBtn" type="button">🎲 Surprise Me</button>
+                <button class="btn goodOutline" id="latestBtn" type="button">🟩 Latest Mix</button>
+              </div>
+
+              <p class="hint">
+                Shortcuts: <span class="kbd">/</span> to search, <span class="kbd">Esc</span> to clear.
+              </p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panelHd">
+              <span>Next Mix</span>
+              <span class="chip cyan" id="nextUpChip">Spring 2026</span>
+            </div>
+            <div class="panelBd">
+              <p class="hint" id="nextUpLine" style="margin:0"></p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panelHd">
+              <span>THE BEET SALAD</span>
+              <span class="chip green">ONLY ON SPOTIFY</span>
+            </div>
+            <div class="panelBd">
+              <p class="hint" style="margin:0 0 10px">
+                Nick’s growing playlist of tasty beats, bedroom pop, and melodic house.
+              </p>
+
+              <a class="beetBtn spotify" id="beetSaladBtn"
+                 href="https://open.spotify.com/playlist/4doEPH3QX1inqS7PEYu5bU?si=54f69c99c8774a13&pt=ac316f5c71cd8c7129780a03fc609ce0"
+                 target="_blank" rel="noopener" title="Spotify">
+                <span class="srOnly">Spotify</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                  <path d="M7 10c4-1 8-.5 11 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                  <path d="M7.5 13c3-1 6-.6 9 .8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                  <path d="M8 16c2-.6 4-.4 6 .5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                </svg>
+                <span>SAVE TO YOUR LIBRARY</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panelHd">
+              <span>Credits</span>
+              <span></span>
+            </div>
+            <div class="panelBd">
+              <p class="hint" id="creditsText" style="margin:0"></p>
+            </div>
+          </div>
+        </aside>
+
+        <main class="main">
+          <div id="latest"></div>
+          <div class="sections" id="sections"></div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="toTop" id="toTopWrap">
+    <button class="btn tealOutline" id="toTopBtn" type="button" aria-label="Back to top">⬆️ Back to top</button>
+  </div>
+
+  <script>
+    (function(){
+      "use strict";
+
+      const $ = (sel, root = document) => root.querySelector(sel);
+
+      function safeText(s){ return String(s ?? "").trim(); }
+      function normalize(s){ return safeText(s).toLowerCase(); }
+
+      function escapeHtml(s){
+        return String(s)
+          .replaceAll("&","&amp;")
+          .replaceAll("<","&lt;")
+          .replaceAll(">","&gt;")
+          .replaceAll('"',"&quot;")
+          .replaceAll("'","&#039;");
+      }
+
+      function escapeAttr(s){
+        return String(s).replaceAll('"', "&quot;");
+      }
+
+      function toast(msg){
+        const el = $("#toast");
+        el.textContent = msg;
+        el.style.display = "block";
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => { el.style.display = "none"; }, 1600);
+      }
+
+      const THEME_KEY = "mixtape_theme";
+      function applyTheme(theme){
+        const t = theme === "light" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", t);
+        localStorage.setItem(THEME_KEY, t);
+        $("#themeToggle").textContent = t === "light" ? "☀️ Light" : "🌙 Dark";
+      }
+      function initTheme(){
+        const saved = localStorage.getItem(THEME_KEY);
+        if(saved === "light" || saved === "dark"){
+          applyTheme(saved);
+          return;
+        }
+        const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+        applyTheme(prefersLight ? "light" : "dark");
+      }
+
+      const creditsCopy =
+        "Website and playlists created by Nick Pavano. This is a personal project. All music is linked out to streaming services, nothing is hosted here.\n\n" +
+        "As of Winter 2025, playlists are arranged by key and tempo. Listen in order for the best experience.";
+
+      function daysUntil(targetDate){
+        const now = new Date();
+        const target = new Date(targetDate);
+        const ms = target.getTime() - now.getTime();
+        const days = Math.ceil(ms / (1000 * 60 * 60 * 24));
+        return Math.max(0, days);
+      }
+
+      function updateNextMixCountdown(){
+        const days = daysUntil("2026-03-21T00:00:00");
+        $("#nextUpLine").textContent = "Countdown to Spring Chickens: " + days + " days";
+      }
+
+      const library = [
+        { title:"Wintry Mix", year:2025, season:"Winter", spotify:"https://open.spotify.com/playlist/00GSrKLaswLCJwALhaGrdT?si=0932d3a1445d4db6", apple:"", youtube:"http://www.youtube.com", notesMustListens:"", notesSounds:"" },
+        { title:"Fall Foliage", year:2025, season:"Fall", spotify:"https://open.spotify.com/playlist/1xtXrdiZi9GoCUjoZYPY2d?si=9bea6c5fbc4c4c59", apple:"https://music.apple.com/us/playlist/nicks-fall-foliage-2025/pl.u-aeNZh0MEDg", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Summer Solstice", year:2025, season:"Summer", spotify:"https://open.spotify.com/playlist/3BkuFGqCZJyLOxnnY5YWRb?si=86b1eaf4ccae41c8", apple:"https://music.apple.com/us/playlist/nicks-summer-solstice-2025/pl.u-mJm8s75ZEK", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Spring Break", year:2025, season:"Spring", spotify:"https://open.spotify.com/playlist/0FcGeB2aVgjhz4L2loLl2H?si=05eb054ceabe43ce", apple:"https://music.apple.com/us/playlist/nicks-spring-break-2025/pl.u-Ddg3TZVrEA", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Winter Wonderland", year:2024, season:"Winter", spotify:"https://open.spotify.com/playlist/17SEObfwY3t1lV4qiKiyHJ?si=af702f0eed994097", apple:"https://music.apple.com/us/playlist/nicks-winter-wonderland-2024/pl.u-V9apI5pYV0", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Fall Snickerdoodles", year:2024, season:"Fall", spotify:"https://open.spotify.com/playlist/3ovyYk3AwSz6wnN779Byim?si=f90df98997434245", apple:"https://open.spotify.com/playlist/3ovyYk3AwSz6wnN779Byim?si=f90df98997434245", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Summer Squash", year:2024, season:"Summer", spotify:"https://open.spotify.com/playlist/67cwvZSimySJnxt2NiRkTn?si=cc13d7f0587a412b", apple:"https://open.spotify.com/playlist/67cwvZSimySJnxt2NiRkTn?si=cc13d7f0587a412b", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Spring Fling", year:2024, season:"Spring", spotify:"https://open.spotify.com/playlist/4KrFHgeIcFPmqM0OKzsRIk?si=5883b09a958e4950", apple:"https://music.apple.com/us/playlist/nicks-spring-fling-2024/pl.u-9NVdTqENGD", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Holiday Ham", year:2023, season:"Winter", spotify:"https://open.spotify.com/playlist/4hfZspSBh2lBa486nM6JYB?si=f20dc50a294b46f1", apple:"https://music.apple.com/us/playlist/nicks-holiday-ham-2023/pl.u-38qyspDy61", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Autumn Harvest", year:2023, season:"Fall", spotify:"https://open.spotify.com/playlist/7IVBY0ZgzxTFIQwTNrCUNq?si=83261c9f3c6d4740", apple:"https://open.spotify.com/playlist/7IVBY0ZgzxTFIQwTNrCUNq?si=83261c9f3c6d4740", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Summer Rolls", year:2023, season:"Summer", spotify:"https://open.spotify.com/playlist/2OeaDDad8YiqoylkHiAfVt?si=f5a7388c787e4adb", apple:"https://music.apple.com/us/playlist/nicks-summer-rolls-2023/pl.u-V9X9s5pYV0", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Spring Mix", year:2023, season:"Spring", spotify:"https://open.spotify.com/playlist/1PMFU11eR8QyPJm9jiPRTP?si=67d2cffc54b94ac0", apple:"https://open.spotify.com/playlist/1PMFU11eR8QyPJm9jiPRTP?si=67d2cffc54b94ac0", youtube:"", notesMustListens:"", notesSounds:"" },
+        { title:"Winterberry Jamz", year:2022, season:"Winter", spotify:"https://open.spotify.com/playlist/00RmlWaUoNBf2f0t8hjYmD?si=19368f6077434af5", apple:"https://music.apple.com/us/playlist/nicks-winterberry-jamz-2022/pl.u-76Myt0X3Lm", youtube:"", notesMustListens:"", notesSounds:"" }
+      ];
+
+      const coverCache = new Map();
+
+      async function fetchSpotifyCover(spotifyUrl){
+        const url = safeText(spotifyUrl);
+        if(!url) return "";
+        if(coverCache.has(url)) return coverCache.get(url);
+
+        const oembed = "https://open.spotify.com/oembed?url=" + encodeURIComponent(url);
+        try{
+          const res = await fetch(oembed, { method: "GET" });
+          if(!res.ok) throw new Error("oEmbed fetch failed");
+          const data = await res.json();
+          const thumb = safeText(data.thumbnail_url);
+          coverCache.set(url, thumb);
+          return thumb;
+        }catch{
+          coverCache.set(url, "");
+          return "";
+        }
+      }
+
+      function uniqueYears(items){
+        return Array.from(new Set(items.map(x => x.year))).sort((a,b) => b - a);
+      }
+
+      function getFilters(){
+        const q = normalize($("#q").value);
+        const season = safeText($("#seasonFilter").value);
+        const yearRaw = safeText($("#yearFilter").value);
+        const year = yearRaw ? parseInt(yearRaw, 10) : null;
+        return { q, season, year };
+      }
+
+      function itemMatchesFilters(it, filters){
+        if(filters.season && it.season !== filters.season) return false;
+        if(filters.year && it.year !== filters.year) return false;
+        if(filters.q){
+          const blob = (it.title + " " + it.year + " " + it.season).toLowerCase();
+          if(!blob.includes(filters.q)) return false;
+        }
+        return true;
+      }
+
+      function filterItems(items){
+        const filters = getFilters();
+        return items.filter(it => itemMatchesFilters(it, filters));
+      }
+
+      function isFilteringActive(){
+        const f = getFilters();
+        return Boolean(f.q || f.season || f.year);
+      }
+
+      function clearFilters(){
+        $("#q").value = "";
+        $("#seasonFilter").value = "";
+        $("#yearFilter").value = "";
+      }
+
+      function slugify(s){
+        return normalize(s)
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/(^_|_$)/g, "")
+          .slice(0, 70) || "mix";
+      }
+
+      function anchorFor(it){
+        return "mix_" + slugify(it.season) + "_" + it.year + "_" + slugify(it.title);
+      }
+
+      /* NEW: groups are created in the exact order they appear in listForMain */
+      function groupSeasonThenYearInEncounterOrder(itemsInDesiredOrder){
+        const groups = [];
+        const idx = new Map();
+
+        for(const it of itemsInDesiredOrder){
+          const key = it.season + "|" + it.year;
+          if(!idx.has(key)){
+            idx.set(key, groups.length);
+            groups.push({ season: it.season, year: it.year, items: [] });
+          }
+          groups[idx.get(key)].items.push(it);
+        }
+
+        return groups;
+      }
+
+      function platformSvg(kind){
+        if(kind === "spotify"){
+          return `
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M7 10c4-1 8-.5 11 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M7.5 13c3-1 6-.6 9 .8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              <path d="M8 16c2-.6 4-.4 6 .5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            </svg>`;
+        }
+        if(kind === "apple"){
+          return `
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M16.5 13.2c0 3-2.2 6-4.7 6-2.2 0-3.5-1.2-5.2-1.2-1.7 0-3 1.2-5.2 1.2C-1 19.2 1 10.2 5.5 10.2c1.8 0 3.2 1.2 5.2 1.2 2 0 3.1-1.2 5.2-1.2 1.1 0 2.4.5 3.2 1.4-2.7 1.6-2.6 5.2-.6 6.6z"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+              <path d="M14.3 4.6c-.8 1.1-2 1.9-3.2 1.8-.1-1.4.7-2.7 1.5-3.6.8-.9 2.2-1.6 3.4-1.6.1 1.2-.3 2.4-1.7 3.4z"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+            </svg>`;
+        }
+        return `
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle>
+            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"></circle>
+            <path d="M11 10.6v2.8l2.6-1.4-2.6-1.4z" fill="currentColor"></path>
+          </svg>`;
+      }
+
+      function linkOrDisabled(url, title, svg, cls, labelText){
+        const u = safeText(url);
+        const className = "iconLink " + (cls || "");
+        const label = escapeHtml(labelText || title);
+
+        if(u){
+          return `<a class="${className}" href="${escapeAttr(u)}" target="_blank" rel="noopener" title="${escapeAttr(title)}">
+            <span class="srOnly">${escapeHtml(title)}</span>
+            ${svg}
+            <span>${label}</span>
+          </a>`;
+        }
+
+        return `<span class="${className} disabled" title="Coming soon">
+          ${svg}
+          <span>${label}</span>
+        </span>`;
+      }
+
+      function linerNotesAlways(it){
+        const must = safeText(it.notesMustListens) || "Add a few essential tracks.";
+        const tasting = safeText(it.notesSounds) || "Describe the vibe in a sentence or two.";
+
+        return `
+          <div class="liner">
+            <p class="linerTitle">J-CARD</p>
+            <div class="linerGrid">
+              <div class="jbox">
+                <h4>Must listens</h4>
+                <p>${escapeHtml(must)}</p>
+              </div>
+              <div class="jbox">
+                <h4>TASTING NOTES</h4>
+                <p>${escapeHtml(tasting)}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderFeaturedMix(it){
+        const img = safeText(it.imageUrl || "");
+        const artHtml = img
+          ? `<img src="${escapeAttr(img)}" alt="${escapeHtml(it.title)} cover art" loading="lazy" />`
+          : `<div style="font-family:var(--mono); font-size:12px; color:color-mix(in srgb, var(--txt) 70%, transparent)">NO COVER</div>`;
+
+        return `
+          <div class="featureRow" id="${escapeHtml(anchorFor(it))}">
+            <div class="featureArt">${artHtml}</div>
+            <div class="featureBody">
+              <h3 class="mixTitle">${escapeHtml(it.title)}</h3>
+              <div class="mixBadges">
+                <span class="pill season">${escapeHtml(it.season)}</span>
+                <span class="pill year">${escapeHtml(String(it.year))}</span>
+              </div>
+
+              ${linerNotesAlways(it)}
+
+              <div class="links">
+                ${linkOrDisabled(it.spotify, "Spotify", platformSvg("spotify"), "spotify", "Spotify")}
+                ${linkOrDisabled(it.apple, "Apple Music", platformSvg("apple"), "apple", "Apple Music")}
+                ${linkOrDisabled(it.youtube, "YouTube Music", platformSvg("youtube"), "youtube", "YouTube Music")}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderLatestMix(it){
+        return `
+          <div class="latestWrap" id="latestWrap">
+            <div class="latestHd">
+              <span>Latest Mix</span>
+              <span>${escapeHtml(it.season)} ${escapeHtml(String(it.year))}</span>
+            </div>
+            ${renderFeaturedMix(it)}
+          </div>
+        `;
+      }
+
+      async function hydrateCovers(items){
+        let changed = false;
+        for(const it of items){
+          if(safeText(it.imageUrl)) continue;
+          if(!safeText(it.spotify)) continue;
+
+          const cover = await fetchSpotifyCover(it.spotify);
+          if(cover){
+            it.imageUrl = cover;
+            changed = true;
+          }
+        }
+        if(changed) render();
+      }
+
+      function clearFound(){
+        document.querySelectorAll(".featureRow.found").forEach(el => el.classList.remove("found"));
+      }
+
+      function jumpToMixById(id){
+        const el = document.getElementById(id);
+        if(!el) return;
+
+        clearFound();
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("found");
+        setTimeout(() => el.classList.remove("found"), 3100);
+      }
+
+      function surpriseMe(){
+        const visible = filterItems(library);
+        const newestOverall = library[0];
+        const pool = visible.filter(it => it !== newestOverall);
+        const pickFrom = pool.length ? pool : visible;
+
+        if(!pickFrom.length){
+          return toast("No mixes found");
+        }
+
+        const pick = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+        toast("Found file: " + pick.title);
+        jumpToMixById(anchorFor(pick));
+      }
+
+      function updateToTopVisibility(){
+        const wrap = document.getElementById("toTopWrap");
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        if(y > 220) wrap.classList.add("show");
+        else wrap.classList.remove("show");
+      }
+
+      function goToLatest(){
+        const newestOverall = library[0];
+        if(!newestOverall) return;
+
+        if(isFilteringActive()){
+          clearFilters();
+          render();
+        }
+
+        toast("Jumping to latest mix");
+        const id = anchorFor(newestOverall);
+        setTimeout(() => jumpToMixById(id), 50);
+      }
+
+      function render(){
+        document.getElementById("countChip").textContent = String(library.length);
+        document.getElementById("creditsText").textContent = creditsCopy;
+        document.getElementById("nextUpChip").textContent = "Spring 2026";
+
+        updateNextMixCountdown();
+
+        const years = uniqueYears(library);
+        const yearFilter = document.getElementById("yearFilter");
+        const currentYear = yearFilter.value;
+        yearFilter.innerHTML = `<option value="">All years</option>` + years.map(y => `<option>${y}</option>`).join("");
+        if(years.includes(parseInt(currentYear,10))) yearFilter.value = currentYear;
+
+        const newestOverall = library[0];
+
+        const filtering = isFilteringActive();
+        const filters = getFilters();
+        const latestMatches = newestOverall ? itemMatchesFilters(newestOverall, filters) : false;
+
+        const filtered = filterItems(library);
+
+        if(newestOverall && (!filtering || latestMatches)){
+          document.getElementById("latest").innerHTML = renderLatestMix(newestOverall);
+        }else{
+          document.getElementById("latest").innerHTML = "";
+        }
+
+        let listForMain = filtered.slice();
+        const shouldExcludeLatestFromMain = newestOverall && (!filtering || latestMatches);
+        if(shouldExcludeLatestFromMain){
+          listForMain = listForMain.filter(it => it !== newestOverall);
+        }
+
+        const groups = groupSeasonThenYearInEncounterOrder(listForMain);
+
+        const html = groups.map(g => `
+          <div class="section">
+            <div class="sectionHd">
+              <h2>${escapeHtml(g.season)} ${escapeHtml(String(g.year))}</h2>
+            </div>
+            <div class="cards">
+              ${g.items.map(renderFeaturedMix).join("")}
+            </div>
+          </div>
+        `).join("");
+
+        document.getElementById("sections").innerHTML = html || `
+          <div class="section">
+            <div class="sectionHd"><h2>No results</h2></div>
+            <div class="cards">
+              <div class="featureRow">
+                <div class="featureArt"><div style="font-family:var(--mono); font-size:12px; color:color-mix(in srgb, var(--txt) 70%, transparent)">EMPTY</div></div>
+                <div class="featureBody">
+                  <h3 class="mixTitle">Nothing matched</h3>
+                  <p class="hint" style="position:relative; margin:0">Clear filters, or add more mixes.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        hydrateCovers(library);
+      }
+
+      ["q","seasonFilter","yearFilter"].forEach(id => {
+        document.getElementById(id).addEventListener("input", render);
+        document.getElementById(id).addEventListener("change", render);
+      });
+
+      document.getElementById("surpriseBtn").addEventListener("click", surpriseMe);
+      document.getElementById("latestBtn").addEventListener("click", goToLatest);
+
+      document.addEventListener("keydown", (e) => {
+        if(e.key === "/"){
+          e.preventDefault();
+          document.getElementById("q").focus();
+        }
+        if(e.key === "Escape"){
+          clearFilters();
+          render();
+          toast("Cleared");
+        }
+      });
+
+      document.getElementById("themeToggle").addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme") || "dark";
+        applyTheme(current === "dark" ? "light" : "dark");
+      });
+
+      document.getElementById("toTopBtn").addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      window.addEventListener("scroll", updateToTopVisibility, { passive:true });
+
+      initTheme();
+      render();
+      updateToTopVisibility();
+
+      setInterval(updateNextMixCountdown, 60 * 1000);
+    })();
+  </script>
+</body>
+</html>
