@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Community mixes, Nick's Mixes</title>
+  <meta name="description" content="Community mixes submitted by listeners." />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="window">
+      <div class="titlebar">
+        <div class="titleLeft">
+          <div class="appIcon" aria-hidden="true"></div>
+          <div class="appTitle">
+            <h1>Community mixes</h1>
+            <p>Hand stamped, fan submitted, and playlist powered.</p>
+          </div>
+        </div>
+
+        <div class="titleRight">
+          <a class="btn tealOutline small" href="./index.html">🏠 Home</a>
+          <a class="btn purpleOutline small" href="./submit.html">📨 Submit a mix</a>
+          <button class="btn small" id="themeToggle" type="button" aria-label="Toggle light or dark mode">🌙 Dark</button>
+
+          <div class="winBtns" aria-hidden="true">
+            <div class="dot red"></div>
+            <div class="dot yellow"></div>
+            <div class="dot green"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <aside class="sidebar">
+          <div class="panel">
+            <div class="panelHd">
+              <span>Filter rack</span>
+              <span class="chip green" id="communityCount">0</span>
+            </div>
+            <div class="panelBd">
+              <div class="field">
+                <label for="cq">Search</label>
+                <input id="cq" type="text" placeholder="title, vibe, tags..." autocomplete="off" />
+              </div>
+
+              <div class="field">
+                <label for="genreFilter">Genre</label>
+                <select id="genreFilter">
+                  <option value="">All genres</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="moodFilter">Mood</label>
+                <select id="moodFilter">
+                  <option value="">All moods</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="activityFilter">Activity</label>
+                <select id="activityFilter">
+                  <option value="">All activities</option>
+                </select>
+              </div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap">
+                <button class="btn tealOutline" id="clearCommunityFilters" type="button">🧽 Clear</button>
+                <a class="btn purpleOutline" href="./submit.html">📨 Submit a mix</a>
+              </div>
+
+              <p class="hint">
+                Tip: press <span class="kbd">/</span> to jump into search.
+              </p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panelHd">
+              <span>How this works</span>
+              <span class="chip cyan">Curated</span>
+            </div>
+            <div class="panelBd">
+              <p class="hint" style="margin:0">
+                Mixes are submitted through GitHub, then added after a quick review. Keep it fun, keep it kind, keep it playable.
+              </p>
+            </div>
+          </div>
+        </aside>
+
+        <main class="main">
+          <div class="section">
+            <div class="sectionHd">
+              <h2>Spotlight</h2>
+              <span class="chip">Pinned</span>
+            </div>
+            <div class="gridWrap" id="communityFeatured"></div>
+          </div>
+
+          <div class="section">
+            <div class="sectionHd">
+              <h2>All community mixes</h2>
+              <span class="chip cyan">2 by 2 grid</span>
+            </div>
+            <div class="gridWrap" id="communityGrid"></div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="toTop" id="toTopWrap">
+    <button class="btn tealOutline" id="toTopBtn" type="button" aria-label="Back to top">⬆️ Back to top</button>
+  </div>
+
+  <script src="./assets/js/app.js"></script>
+  <script>
+    window.MixesApp.initCommon();
+    window.MixesApp.initCommunityPage();
+  </script>
+</body>
+</html>

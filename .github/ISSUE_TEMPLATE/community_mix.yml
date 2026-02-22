@@ -1,0 +1,97 @@
+name: Community mix submission
+description: Submit a community mix for Nick's Mixes
+title: "Submission: "
+labels: ["community-mix", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for submitting a mix.
+        Keep it short, keep it fun, and link a playlist.
+
+  - type: input
+    id: title
+    attributes:
+      label: Mix title
+      description: The name of your mix
+      placeholder: Neon Night Drive
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Short description
+      description: One or two sentences
+      placeholder: Synth, chrome, and highway lines at 2 AM.
+    validations:
+      required: true
+
+  - type: input
+    id: spotify
+    attributes:
+      label: Spotify playlist link
+      description: Paste the full Spotify playlist URL
+      placeholder: https://open.spotify.com/playlist/...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: genre
+    attributes:
+      label: Genre
+      options:
+        - House
+        - Indie Pop
+        - Hip Hop
+        - Rock
+        - Synthwave
+        - Lo fi
+        - Electronic
+        - RnB
+        - Jazz
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mood
+    attributes:
+      label: Mood
+      options:
+        - Calm
+        - Bright
+        - Hype
+        - Night
+        - Cozy
+        - Focus
+        - Melancholy
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: activity
+    attributes:
+      label: Activity
+      options:
+        - Drive
+        - Study
+        - Gym
+        - Breakfast
+        - Party
+        - Work
+        - Chill
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Quick yes
+      options:
+        - label: This is a playlist link, not an upload
+          required: true
+        - label: The description is short and friendly
+          required: true
