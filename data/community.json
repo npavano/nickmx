@@ -2,6 +2,7 @@
   {
     "id": "neon-night-drive",
     "title": "Neon Night Drive",
+    "author": "John Smith",
     "description": "Synth, chrome, and highway lines at 2 AM.",
     "spotify": "https://open.spotify.com/playlist/00GSrKLaswLCJwALhaGrdT?si=0932d3a1445d4db6",
     "genre": "Synthwave",
@@ -13,6 +14,7 @@
   {
     "id": "morning-bagel-club",
     "title": "Morning Bagel Club",
+    "author": "John Smith",    
     "description": "Soft pop and warm guitars, windows open, toast happening.",
     "spotify": "https://open.spotify.com/playlist/1xtXrdiZi9GoCUjoZYPY2d?si=9bea6c5fbc4c4c59",
     "genre": "Indie Pop",
@@ -24,6 +26,7 @@
   {
     "id": "basement-rave-bootleg",
     "title": "Basement Rave Bootleg",
+    "author": "John Smith",   
     "description": "Four on the floor, zero shame, 1999 energy.",
     "spotify": "https://open.spotify.com/playlist/3BkuFGqCZJyLOxnnY5YWRb?si=86b1eaf4ccae41c8",
     "genre": "House",
@@ -35,6 +38,7 @@
   {
     "id": "rainy-window-study",
     "title": "Rainy Window Study",
+    "author": "John Smith",   
     "description": "Lo fi, soft keys, and gentle momentum.",
     "spotify": "https://open.spotify.com/playlist/0FcGeB2aVgjhz4L2loLl2H?si=05eb054ceabe43ce",
     "genre": "Lo fi",
